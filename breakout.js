@@ -2,7 +2,15 @@ const canvas = document.getElementById('breakout');
 const ctx = canvas.getContext('2d');
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
-document.addEventListener("mousemove", mouseMoveHandler)
+document.addEventListener("mousemove", mouseMoveHandler);
+
+document.addEventListener("touchstart", touchHandler);
+document.addEventListener("touchend", function(e) {
+    e.preventDefault();
+    document.removeEventListener("touchmove", function(e) {
+        e.preventDefault();
+    }); 
+});
 
 let game = {    
     requestId: null,
@@ -30,7 +38,8 @@ let brick = {
 let images = {
     background: new Image(),
     ball: new Image(),
-    paddle: new Image()
+    paddle: new Image(),
+    bricks: new Image()
 }
 function onImageLoad(e) {
     resetGame();
@@ -45,6 +54,8 @@ images.background.addEventListener('load', onImageLoad);
 images.background.src = './images/bg-space.webp';
 images.ball.src = './images/ball.webp';
 images.paddle.src = './images/paddle.webp';
+images.bricks.src = './images/bottle.png';  //bricks image
+
 
 const sounds = {
     ballLost: new Audio('./sounds/ball-lost.mp3'),
@@ -166,9 +177,22 @@ function update() {
 }
 
 function drawBricks() {
+    console.log("drawBricks:", images.bricks);
+    // images.bricks.onload = function() {
+    //     console.log("onload");
+    //     ctx.drawImage(images.bricks, brick.x, brick.y, brick.width, brick.height);
+    // }
+    const pattern = ctx.createPattern(images.bricks, 'repeat');  
+
     brickField.forEach((brick) => {
+    
+        //if hits - img is shown: 
+        // ctx.drawImage(images.bricks, brick.x, brick.y, brick.width, brick.height);
+
       if (brick.hitsLeft) {
-        ctx.fillStyle = brick.color;
+        // ctx.fillStyle = brick.color;
+        ctx.fillStyle = pattern;
+
         ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
         ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
       }
@@ -302,6 +326,25 @@ function mouseMoveHandler(e) {
         paddle.x = mouseX - paddle.width / 2;
     }
 }
+
+//touch events
+function touchHandler(e) {
+
+    //Only start game if touch StartBtn
+    if (e.target.id === "play-button") {
+        play();
+    };
+    
+    document.addEventListener("touchmove", function(e) {
+        e.preventDefault();
+        const touchMoveX = e.touches[0].clientX;
+        paddle.x = touchMoveX - paddle.width / 2;
+    
+        // console.log("touchmove inside touchstart", touchMoveX);
+        // console.log("paddle.x:", paddle.x);
+    });
+};
+
 
 function isLevelCompleted() {
     const levelComplete = brickField.every((b) => b.hitsLeft === 0);
