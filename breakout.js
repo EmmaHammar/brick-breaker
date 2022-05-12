@@ -200,17 +200,6 @@ function drawBricks() {
 
     // console.log("bricks.hitsLeft:", bricks.hitsLeft);
 
-    // let imagePos = [ [10,10], [10,20], [10,30], [10,40], [10,50], [20,10], [20,20], [20,30], [20,40], [20,50] ];
-    // for(let i=0; i<10; i+=1) {
-    //     createImage(i);
-    // };
-
-
-    // brick.x=30;
-    // brick.y=100;
-    
-    // ctx.drawImage(images.bricks, brick.x, brick.y, brick.width, brick.height);
-    
     // console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
 
     // brickField.forEach((brick) => { //TODO remove fat arrow
@@ -221,8 +210,7 @@ function drawBricks() {
     //     // ctx.drawImage(images.bricks, brick.x, brick.y, brick.width, brick.height);
     //     // console.log("brick.hitsLeft:", brick.hitsLeft);
 
-    //     //if brick.hitsLeft = 1 = false?
-    //     // hitsLeft: row === 0 ? 2 : 1
+    //     //if brick.hitsLeft = 1 => no hit? (hitsLeft: row === 0 ? 2 : 1)
     //   if (brick.hitsLeft) {
     //     // ctx.fillStyle = brick.color;
     //     // ctx.fillStyle = pattern;
@@ -293,27 +281,52 @@ function detectBrickCollision() {
         ball.y < brick.y + brick.height;
   
     // rewrite this one?
-
     brickField.forEach( function(brick) {
-      
-
-
         if (brick.hitsLeft && isBallInsideBrick(brick)) {
             // console.log("brick.hitsLeft i if:", brick.hitsLeft, "isBallInsideBrick(brick):", isBallInsideBrick(brick));
-            console.log("brick.hitsLeft--:", brick.hitsLeft--);
-    //         sounds.brick.currentTime = 0;
-    //         game.sfx && sounds.brick.play();
-    //         brick.hitsLeft--;
-    //         if (brick.hitsLeft === 1) {
-    //             brick.color = 'darkgray';
-    //             console.log("ta bort flaska!");
-    //         }
-    //         game.score += brick.points;
+            
+            sounds.brick.currentTime = 0;
+            game.sfx && sounds.brick.play();
+            brick.hitsLeft--;
+            if (brick.hitsLeft === 1) {
+                brick.color = 'darkgray';
+            }
+            // if (brick.hitsLeft === 0) {
+            //     console.log("brick.hitsLeft=0, TRÄFF");
+            //     // console.log("brick.color"); //tom
+            //     console.log("images.brick:", images.brick); //tom
+            // }
+            // console.log("brick.points:", brick.points, "game.score:", game.score);
+            game.score += brick.points;
     
-    //         if (!directionChanged) {
-    //             directionChanged = true;
-    //             detectCollisionDirection(brick);
-    //         }
+            if (!directionChanged) {
+                console.log("remove brick:", brick);
+                directionChanged = true;
+                detectCollisionDirection(brick);
+
+                //clear img which is hit:
+                // console.log("canvas:", canvas.width, canvas.height);
+                console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
+
+                
+                //remove function
+                function removeImage(brickX, brickY, brickWidt, brickHeight) {
+                    // ctx.clearRect(brickX, brickY, brickWidt, brickHeight);
+                    ctx.clearRect(brickX, brickY, canvas.width, canvas.height);
+
+                };
+                //for loop?
+                brickField.forEach( function(brick) {
+                    // console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
+                    let brickX = brick.x;
+                    let brickY = brick.y;
+                    let brickWidt = brick.width;
+                    let brickHeight = brick.height;
+            
+                    removeImage(brickX, brickY, brickWidt, brickHeight);
+                } );
+
+            }
         }
     });
 
