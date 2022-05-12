@@ -241,6 +241,13 @@ function detectBrickCollision() {
             if (brick.hitsLeft === 1) {
                 brick.color = 'darkgray';
             }
+            // if (brick.hitsLeft === 2) {
+            //     console.log("brick.hitsLeft=2");
+            // }
+            // if (brick.hitsLeft === 0) {
+            //     console.log("brick.hitsLeft=0, TRÄFF");
+            //     console.log("brick.color");
+            // }
             game.score += brick.points;
     
             if (!directionChanged) {
