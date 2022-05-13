@@ -4,13 +4,13 @@ document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
 
-document.addEventListener("touchstart", touchHandler);
-document.addEventListener("touchend", function(e) {
-    e.preventDefault();
-    document.removeEventListener("touchmove", function(e) {
-        e.preventDefault();
-    }); 
-});
+// document.addEventListener("touchstart", touchHandler);
+// document.addEventListener("touchend", function(e) {
+//     e.preventDefault();
+//     document.removeEventListener("touchmove", function(e) {
+//         e.preventDefault();
+//     }); 
+// });
 
 let game = {    
     requestId: null,
@@ -30,10 +30,13 @@ let ball = {
     radius: 10
 };
 let brick = {
-    rows: 5,
-    cols: 10,
+    rows: 1,
+    cols: 4,
+    // rows: 4,
+    // cols: 8,
     get width() { return canvas.width / this.cols; },
-    height: 30
+    height: 160
+    // height: 60
 }
 let images = {
     background: new Image(),
@@ -41,21 +44,29 @@ let images = {
     paddle: new Image(),
     bricks: new Image()
 }
-function onImageLoad(e) {
+
+// function onImageLoad(e) {
+function onImageLoad() {
+
+    console.log("onImageLoad() körs")
     resetGame();
     initBricks();
     resetPaddle();
     paint();
     ctx.font = '50px ArcadeClassic';
     ctx.fillStyle = 'lime';
-    ctx.fillText('PRESS START', canvas.width / 2 - 120, canvas.height / 2);
+    // ctx.fillText('Tryck Starta', canvas.width / 2 - 120, canvas.height / 2);
+
 };
-images.background.addEventListener('load', onImageLoad);
+// images.background.addEventListener('load', onImageLoad);
+images.background.onload = function(){
+    onImageLoad();
+};
+
 images.background.src = './images/bg-space.webp';
 images.ball.src = './images/ball.webp';
 images.paddle.src = './images/paddle.webp';
 images.bricks.src = './images/bottle.png';  //bricks image
-
 
 const sounds = {
     ballLost: new Audio('./sounds/ball-lost.mp3'),
@@ -114,9 +125,10 @@ function resetPaddle() {
 }
 
 function initBricks() {
+    console.log("initBricks() körs");
     brickField = [];
     const topMargin = 30;
-    const colors = ['red', 'orange', 'yellow', 'blue', 'green'];
+    // const colors = ['red', 'orange', 'yellow', 'blue', 'green'];
 
     for(let row = 0; row < brick.rows; row++) {
         for(let col = 0; col < brick.cols; col++) {
@@ -125,25 +137,25 @@ function initBricks() {
                 y: row * brick.height + topMargin,
                 height: brick.height,
                 width: brick.width,
-                color: colors[row],
+                // color: colors[row],
+                // src: './images/bottle.png',
+                isShown: true,
                 points: (5 - row) * 2,
                 hitsLeft: row === 0 ? 2 : 1
             });
         }
-    }
+    }    
+    console.log("brickField initial (fr initBricks() ):", brickField);
 }
 
 function animate(now = 0) { 
     game.time.elapsed = now - game.time.start;
     if (game.time.elapsed > game.time.refreshRate) {
         game.time.start = now;
-
-        paint();
+        paint(); 
         update();
         detectCollision();
         detectBrickCollision();
-        // console.log("detectBrickCollision() körs");
-    
         if (isLevelCompleted() || isGameOver()) return;
     }    
 
@@ -151,6 +163,7 @@ function animate(now = 0) {
 }
 
 function paint() {
+    // console.log("paint() körs, images.bricks.src:", images.bricks.src ); 
     ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
     ctx.drawImage(images.ball, ball.x, ball.y, 2 * ball.radius, 2 * ball.radius);
     ctx.drawImage(images.paddle, paddle.x, paddle.y, paddle.width, paddle.height);
@@ -177,50 +190,34 @@ function update() {
     }
 };
 
-
 function drawBricks() {
-    //https://stackoverflow.com/questions/41463192/canvas-drawimage-loop-issue
-    // function createImage(i) {
-    //     ctx.drawImage(images.bricks, imagePos[i][0], imagePos[i][1]);
-    // };
-
-    //Printing imgs after load:
+    console.log("drawBricks() körs");
+  
     function createImage(brickX, brickY, brickWidt, brickHeight) {
         ctx.drawImage(images.bricks, brickX, brickY, brickWidt, brickHeight);
+        // console.log("createImage() körs"); //TODO fix error runs several times when onload
     };
     brickField.forEach( function(brick) {
-        // console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
+        // console.log("brickField.forEach körs"); //TODO fix error runs several times when onload
+        // console.log("fr brickField forEach: brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
         let brickX = brick.x;
         let brickY = brick.y;
         let brickWidt = brick.width;
         let brickHeight = brick.height;
 
-        createImage(brickX, brickY, brickWidt, brickHeight);
+        if (brick.isShown !== false) {
+            createImage(brickX, brickY, brickWidt, brickHeight);
+        } 
     } );
-
-    // console.log("bricks.hitsLeft:", bricks.hitsLeft);
-
-    // console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
-
-    // brickField.forEach((brick) => { //TODO remove fat arrow
-
-    //     // const pattern = ctx.createPattern(images.bricks, 'repeat');  
-    
-    //     //if hits - img is shown: 
-    //     // ctx.drawImage(images.bricks, brick.x, brick.y, brick.width, brick.height);
-    //     // console.log("brick.hitsLeft:", brick.hitsLeft);
-
-    //     //if brick.hitsLeft = 1 => no hit? (hitsLeft: row === 0 ? 2 : 1)
-    //   if (brick.hitsLeft) {
-    //     // ctx.fillStyle = brick.color;
-    //     // ctx.fillStyle = pattern;
-
-    //     //ctx.fillRect(0, 0, 150, 100); = upper left corner, 150 width, 100 height, 
-    //     ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
-    //     ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
-    //   }
+    // const isBricksExist = brickField.some( function(br) {
+    //     // console.log("br.isShown:", br.isShown);
+    //     return br.isShown === true
     // });
-  }
+    // console.log("isBricksExist false=Level completed:", isBricksExist, "brickField:", brickField);
+    // if (isBricksExist == false) {
+    //     alert('nästa nivå')
+    // }
+}
 
 function drawScore() {
     ctx.font = '24px ArcadeClassic';
@@ -273,60 +270,47 @@ function detectCollision() {
 }
 
 function detectBrickCollision() {
-    let directionChanged = false;
+    // let directionChanged = false;
     const isBallInsideBrick = (brick) => 
         ball.x + 2 * ball.radius > brick.x &&
         ball.x < brick.x + brick.width && 
         ball.y + 2 * ball.radius > brick.y && 
         ball.y < brick.y + brick.height;
   
-    // rewrite this one?
     brickField.forEach( function(brick) {
         if (brick.hitsLeft && isBallInsideBrick(brick)) {
-            // console.log("brick.hitsLeft i if:", brick.hitsLeft, "isBallInsideBrick(brick):", isBallInsideBrick(brick));
             
             sounds.brick.currentTime = 0;
             game.sfx && sounds.brick.play();
             brick.hitsLeft--;
-            if (brick.hitsLeft === 1) {
-                brick.color = 'darkgray';
-            }
+            // if (brick.hitsLeft === 1) {
+            //     brick.color = 'darkgray';
+            // }
             // if (brick.hitsLeft === 0) {
-            //     console.log("brick.hitsLeft=0, TRÄFF");
+            //     console.log("TRÄFF");
             //     // console.log("brick.color"); //tom
             //     console.log("images.brick:", images.brick); //tom
             // }
-            // console.log("brick.points:", brick.points, "game.score:", game.score);
             game.score += brick.points;
     
-            if (!directionChanged) {
+            // if (!directionChanged) {
                 console.log("remove brick:", brick);
-                directionChanged = true;
-                detectCollisionDirection(brick);
-
-                //clear img which is hit:
-                // console.log("canvas:", canvas.width, canvas.height);
-                console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
-
                 
-                //remove function
-                function removeImage(brickX, brickY, brickWidt, brickHeight) {
-                    // ctx.clearRect(brickX, brickY, brickWidt, brickHeight);
-                    ctx.clearRect(brickX, brickY, canvas.width, canvas.height);
+                //Find index of hit brick
+                const index = brickField.findIndex(function(obj) {
+                    return (obj.x == brick.x) && (obj.y == brick.y)
+                });
+                // console.log("indexOf hit brick:", index);
 
-                };
-                //for loop?
-                brickField.forEach( function(brick) {
-                    // console.log("brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
-                    let brickX = brick.x;
-                    let brickY = brick.y;
-                    let brickWidt = brick.width;
-                    let brickHeight = brick.height;
+                //set hit brick isShown to false
+                brickField[index].isShown = false;
             
-                    removeImage(brickX, brickY, brickWidt, brickHeight);
-                } );
-
-            }
+                // directionChanged = true;
+                detectCollisionDirection(brick);
+                
+            // } else {
+            //     console.log("körs denna för flaskor som ej tas bort?");
+            // }
         }
     });
 
@@ -386,25 +370,35 @@ function mouseMoveHandler(e) {
 
 //touch events
 function touchHandler(e) {
+    console.log("touchHandler körs");
 
     //Only start game if touch StartBtn
     if (e.target.id === "play-button") {
         play();
     };
-    
+    // let isMobile = function detectMob() {
+    //     return ( ( window.innerWidth <= 800 ) && ( window.innerHeight <= 600 ) );
+    // };
+    // console.log("isMobile:", isMobile);
+
+
     document.addEventListener("touchmove", function(e) {
         // e.preventDefault(); //creating error: [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See <URL>
         const touchMoveX = e.touches[0].clientX;
         paddle.x = touchMoveX - paddle.width / 2;
-    
-        // console.log("touchmove inside touchstart", touchMoveX);
-        // console.log("paddle.x:", paddle.x);
     });
 };
 
 
 function isLevelCompleted() {
-    const levelComplete = brickField.every((b) => b.hitsLeft === 0);
+    const levelComplete = brickField.every(function(b) {
+        b.hitsLeft === 0
+        // console.log("b.hitsLeft:", b.hitsLeft);
+        // console.log("b:", b.isShown);
+        // b.isShown == false
+    });
+    console.log("levelComplete:", levelComplete, "brickField:", brickField); //TODO atm needs 1 extra hit before turning true
+    
 
     if (levelComplete) {
         initNextLevel();
