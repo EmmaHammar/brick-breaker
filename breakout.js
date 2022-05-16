@@ -183,11 +183,6 @@ function update() {
 };
 
 function drawBricks() {
-  
-    //TODO change place?
-    function createImage(brickX, brickY, brickWidt, brickHeight) {
-        ctx.drawImage(images.bricks, brickX, brickY, brickWidt, brickHeight);
-    };
     brickField.forEach( function(brick) {
         let brickX = brick.x;
         let brickY = brick.y;
@@ -195,7 +190,7 @@ function drawBricks() {
         let brickHeight = brick.height;
 
         if (brick.isShown !== false) {
-            createImage(brickX, brickY, brickWidt, brickHeight);
+            ctx.drawImage(images.bricks, brickX, brickY, brickWidt, brickHeight);
         } 
     } );
 }
