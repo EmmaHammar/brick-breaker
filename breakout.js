@@ -4,13 +4,13 @@ document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
 
-// document.addEventListener("touchstart", touchHandler);
-// document.addEventListener("touchend", function(e) {
-//     e.preventDefault();
-//     document.removeEventListener("touchmove", function(e) {
-//         e.preventDefault();
-//     }); 
-// });
+document.addEventListener("touchstart", touchHandler);
+document.addEventListener("touchend", function(e) {
+    e.preventDefault();
+    document.removeEventListener("touchmove", function(e) {
+        e.preventDefault();
+    }); 
+});
 
 let game = {    
     requestId: null,
@@ -59,9 +59,17 @@ function onImageLoad() {
 
 };
 // images.background.addEventListener('load', onImageLoad);
-images.background.onload = function(){
+// images.background.onload = function(){
+// images.bricks.onload = function(){
+//     onImageLoad();
+// };
+
+//check if multiple images loaded, onImageLoad() is run after all images are loaded: 
+window.onload = function() {
     onImageLoad();
 };
+
+
 
 images.background.src = './images/bg-space.webp';
 images.ball.src = './images/ball.webp';
@@ -392,10 +400,11 @@ function touchHandler(e) {
 
 function isLevelCompleted() {
     const levelComplete = brickField.every(function(b) {
+        console.log("b.hitsLeft:", b.hitsLeft);
         b.hitsLeft === 0
         // console.log("b.hitsLeft:", b.hitsLeft);
         // console.log("b:", b.isShown);
-        // b.isShown == false
+        b.isShown == false
     });
     console.log("levelComplete:", levelComplete, "brickField:", brickField); //TODO atm needs 1 extra hit before turning true
     
