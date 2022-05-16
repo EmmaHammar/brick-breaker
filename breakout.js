@@ -30,13 +30,13 @@ let ball = {
     radius: 10
 };
 let brick = {
-    rows: 1,
-    cols: 4,
-    // rows: 4,
-    // cols: 8,
+    // rows: 1,
+    // cols: 3,
+    // height: 160,
+    rows: 3,
+    cols: 20,
+    height: 80,
     get width() { return canvas.width / this.cols; },
-    height: 160
-    // height: 60
 }
 let images = {
     background: new Image(),
@@ -45,10 +45,7 @@ let images = {
     bricks: new Image()
 }
 
-// function onImageLoad(e) {
 function onImageLoad() {
-
-    console.log("onImageLoad() körs")
     resetGame();
     initBricks();
     resetPaddle();
@@ -56,25 +53,18 @@ function onImageLoad() {
     ctx.font = '50px ArcadeClassic';
     ctx.fillStyle = 'lime';
     // ctx.fillText('Tryck Starta', canvas.width / 2 - 120, canvas.height / 2);
-
 };
-// images.background.addEventListener('load', onImageLoad);
-// images.background.onload = function(){
-// images.bricks.onload = function(){
-//     onImageLoad();
-// };
-
 //check if multiple images loaded, onImageLoad() is run after all images are loaded: 
 window.onload = function() {
     onImageLoad();
 };
 
-
-
 images.background.src = './images/bg-space.webp';
 images.ball.src = './images/ball.webp';
 images.paddle.src = './images/paddle.webp';
-images.bricks.src = './images/bottle.png';  //bricks image
+// images.bricks.src = './images/bottle.png';  //bricks image
+images.bricks.src = './images/bottle-cropped.png';  //cropped image
+
 
 const sounds = {
     ballLost: new Audio('./sounds/ball-lost.mp3'),
@@ -101,7 +91,6 @@ function play() {
     game.sfx && sounds.breakout.play();
     // Start music after starting sound ends.
     setTimeout(() => game.music && sounds.music.play(), 2000);
-
     animate();
 }
 
@@ -133,27 +122,23 @@ function resetPaddle() {
 }
 
 function initBricks() {
-    console.log("initBricks() körs");
     brickField = [];
     const topMargin = 30;
-    // const colors = ['red', 'orange', 'yellow', 'blue', 'green'];
-
     for(let row = 0; row < brick.rows; row++) {
         for(let col = 0; col < brick.cols; col++) {
+            console.log("row:", row);
+
             brickField.push({
                 x: col * brick.width,
                 y: row * brick.height + topMargin,
                 height: brick.height,
                 width: brick.width,
-                // color: colors[row],
-                // src: './images/bottle.png',
                 isShown: true,
-                points: (5 - row) * 2,
-                hitsLeft: row === 0 ? 2 : 1
+                points: (5 - row) * 2, //different scores depending on which row hit
+                hitsLeft: row === 0 ? 1 : 1 //row=0 = highest row
             });
         }
     }    
-    console.log("brickField initial (fr initBricks() ):", brickField);
 }
 
 function animate(now = 0) { 
@@ -171,7 +156,6 @@ function animate(now = 0) {
 }
 
 function paint() {
-    // console.log("paint() körs, images.bricks.src:", images.bricks.src ); 
     ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
     ctx.drawImage(images.ball, ball.x, ball.y, 2 * ball.radius, 2 * ball.radius);
     ctx.drawImage(images.paddle, paddle.x, paddle.y, paddle.width, paddle.height);
@@ -199,15 +183,12 @@ function update() {
 };
 
 function drawBricks() {
-    console.log("drawBricks() körs");
   
+    //TODO change place?
     function createImage(brickX, brickY, brickWidt, brickHeight) {
         ctx.drawImage(images.bricks, brickX, brickY, brickWidt, brickHeight);
-        // console.log("createImage() körs"); //TODO fix error runs several times when onload
     };
     brickField.forEach( function(brick) {
-        // console.log("brickField.forEach körs"); //TODO fix error runs several times when onload
-        // console.log("fr brickField forEach: brick.x:", brick.x, "brick.y:", brick.y, "images.bricks:", images.bricks, "brick.width:", brick.width, "brick.height:", brick.height);
         let brickX = brick.x;
         let brickY = brick.y;
         let brickWidt = brick.width;
@@ -217,14 +198,6 @@ function drawBricks() {
             createImage(brickX, brickY, brickWidt, brickHeight);
         } 
     } );
-    // const isBricksExist = brickField.some( function(br) {
-    //     // console.log("br.isShown:", br.isShown);
-    //     return br.isShown === true
-    // });
-    // console.log("isBricksExist false=Level completed:", isBricksExist, "brickField:", brickField);
-    // if (isBricksExist == false) {
-    //     alert('nästa nivå')
-    // }
 }
 
 function drawScore() {
@@ -286,23 +259,19 @@ function detectBrickCollision() {
         ball.y < brick.y + brick.height;
   
     brickField.forEach( function(brick) {
+        console.log("brick.hitsLeft:", brick.hitsLeft);
         if (brick.hitsLeft && isBallInsideBrick(brick)) {
             
             sounds.brick.currentTime = 0;
             game.sfx && sounds.brick.play();
             brick.hitsLeft--;
-            // if (brick.hitsLeft === 1) {
-            //     brick.color = 'darkgray';
-            // }
-            // if (brick.hitsLeft === 0) {
-            //     console.log("TRÄFF");
-            //     // console.log("brick.color"); //tom
-            //     console.log("images.brick:", images.brick); //tom
-            // }
+
+            
+
             game.score += brick.points;
     
             // if (!directionChanged) {
-                console.log("remove brick:", brick);
+                // console.log("remove brick:", brick);
                 
                 //Find index of hit brick
                 const index = brickField.findIndex(function(obj) {
@@ -315,13 +284,10 @@ function detectBrickCollision() {
             
                 // directionChanged = true;
                 detectCollisionDirection(brick);
-                
-            // } else {
-            //     console.log("körs denna för flaskor som ej tas bort?");
-            // }
-        }
-    });
 
+                isLevelCompleted(); 
+        } 
+    });
 }
 
 function detectCollisionDirection(brick) {
@@ -378,20 +344,13 @@ function mouseMoveHandler(e) {
 
 //touch events
 function touchHandler(e) {
-    console.log("touchHandler körs");
-
     //Only start game if touch StartBtn
     if (e.target.id === "play-button") {
         play();
     };
-    // let isMobile = function detectMob() {
-    //     return ( ( window.innerWidth <= 800 ) && ( window.innerHeight <= 600 ) );
-    // };
-    // console.log("isMobile:", isMobile);
-
 
     document.addEventListener("touchmove", function(e) {
-        // e.preventDefault(); //creating error: [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See <URL>
+        // e.preventDefault(); 
         const touchMoveX = e.touches[0].clientX;
         paddle.x = touchMoveX - paddle.width / 2;
     });
@@ -399,26 +358,15 @@ function touchHandler(e) {
 
 
 function isLevelCompleted() {
-    const levelComplete = brickField.every(function(b) {
-        console.log("b.hitsLeft:", b.hitsLeft);
-        b.hitsLeft === 0
-        // console.log("b.hitsLeft:", b.hitsLeft);
-        // console.log("b:", b.isShown);
-        b.isShown == false
-    });
-    console.log("levelComplete:", levelComplete, "brickField:", brickField); //TODO atm needs 1 extra hit before turning true
-    
+    console.log("brickField:", brickField);
+    const levelComplete = brickField.every((b) => b.hitsLeft === 0);
 
     if (levelComplete) {
         initNextLevel();
         resetBall();
         resetPaddle();
         initBricks();
-        game.timeoutId = setTimeout(() => {
-            animate();
-            sounds.music.play();
-        }, 3000);
-
+        animate();
         return true;
     }
     return false;
@@ -431,7 +379,6 @@ function initNextLevel() {
     game.sfx && sounds.levelCompleted.play();
     ctx.font = '50px ArcadeClassic';
     ctx.fillStyle = 'yellow';
-    ctx.fillText(`LEVEL ${game.level}!`, canvas.width / 2 - 80, canvas.height / 2);
 }
 
 function isGameOver() {
