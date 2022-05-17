@@ -66,15 +66,15 @@ images.paddle.src = './images/paddle.webp';
 images.bricks.src = './images/bottle-cropped.png';  //cropped image
 
 
-const sounds = {
-    ballLost: new Audio('./sounds/ball-lost.mp3'),
-    breakout: new Audio('./sounds/breakout.mp3'),
-    brick: new Audio('./sounds/brick.mp3'),
-    gameOver: new Audio('./sounds/game-over.mp3'),
-    levelCompleted: new Audio('./sounds/level-completed.mp3'),
-    music: new Audio('./sounds/music.mp3'),
-    paddle: new Audio('./sounds/paddle.mp3')
-}
+// const sounds = {
+//     ballLost: new Audio('./sounds/ball-lost.mp3'),
+//     breakout: new Audio('./sounds/breakout.mp3'),
+//     brick: new Audio('./sounds/brick.mp3'),
+//     gameOver: new Audio('./sounds/game-over.mp3'),
+//     levelCompleted: new Audio('./sounds/level-completed.mp3'),
+//     music: new Audio('./sounds/music.mp3'),
+//     paddle: new Audio('./sounds/paddle.mp3')
+// }
 
 let brickField = [];
 
@@ -88,9 +88,11 @@ function play() {
     resetPaddle();
     initBricks();
 
-    game.sfx && sounds.breakout.play();
+    // game.sfx && sounds.breakout.play();
     // Start music after starting sound ends.
-    setTimeout(() => game.music && sounds.music.play(), 2000);
+    // setTimeout(() => game.music && sounds.music.play(), 2000);
+
+
     animate();
 }
 
@@ -102,12 +104,12 @@ function resetGame() {
     game.time = { start: performance.now(), elapsed: 0, refreshRate: 16  };
 }
 
-function initSounds() {
-    sounds.music.loop = true;
-    for (const [key] of Object.entries(sounds)) {
-        sounds[key].volume = 0.5;
-    }
-}
+// function initSounds() {
+//     sounds.music.loop = true;
+//     for (const [key] of Object.entries(sounds)) {
+//         sounds[key].volume = 0.5;
+//     }
+// }
 
 function resetBall() {
     ball.x = canvas.width / 2;
@@ -126,7 +128,6 @@ function initBricks() {
     const topMargin = 30;
     for(let row = 0; row < brick.rows; row++) {
         for(let col = 0; col < brick.cols; col++) {
-            console.log("row:", row);
 
             brickField.push({
                 x: col * brick.width,
@@ -234,7 +235,8 @@ function detectCollision() {
     if (hitPaddle()) {
         ball.dy = -ball.dy;
         ball.y = canvas.height - paddle.height - 2 * ball.radius;
-        game.sfx && sounds.paddle.play();
+        // game.sfx && sounds.paddle.play();
+
         // TODO change this logic to angles with sin/cos
         // Change x depending on where on the paddle the ball bounces.
         // Bouncing ball more on one side draws ball a little to that side.
@@ -254,14 +256,10 @@ function detectBrickCollision() {
         ball.y < brick.y + brick.height;
   
     brickField.forEach( function(brick) {
-        console.log("brick.hitsLeft:", brick.hitsLeft);
         if (brick.hitsLeft && isBallInsideBrick(brick)) {
-            
-            sounds.brick.currentTime = 0;
-            game.sfx && sounds.brick.play();
+            // sounds.brick.currentTime = 0;
+            // game.sfx && sounds.brick.play();
             brick.hitsLeft--;
-
-            
 
             game.score += brick.points;
     
@@ -300,19 +298,19 @@ function keyDownHandler(e) {
     if (!game.on && e.key === ' ') {
         play();
     }
-    if (game.on && (e.key === 'm' || e.key === 'M')) {
-        game.music = !game.music;
-        game.music ? sounds.music.play() : sounds.music.pause();
-    }
+    // if (game.on && (e.key === 'm' || e.key === 'M')) {
+    //     game.music = !game.music;
+    //     game.music ? sounds.music.play() : sounds.music.pause();
+    // }
     if (game.on && (e.key === 's' || e.key === 'S')) {
         game.sfx = !game.sfx;
     }
-    if (e.key === 'ArrowUp') {
-        volumeUp();
-    }
-    if (e.key === 'ArrowDown') {
-        volumeDown();
-    }
+    // if (e.key === 'ArrowUp') {
+    //     volumeUp();
+    // }
+    // if (e.key === 'ArrowDown') {
+    //     volumeDown();
+    // }
     if (e.key === 'ArrowRight') {
         game.rightKey = true;
     } else if (e.key === 'ArrowLeft') {
@@ -353,7 +351,6 @@ function touchHandler(e) {
 
 
 function isLevelCompleted() {
-    console.log("brickField:", brickField);
     const levelComplete = brickField.every((b) => b.hitsLeft === 0);
 
     if (levelComplete) {
@@ -370,8 +367,8 @@ function isLevelCompleted() {
 function initNextLevel() {
     game.level++;
     game.speed++;
-    sounds.music.pause();
-    game.sfx && sounds.levelCompleted.play();
+    // sounds.music.pause();
+    // game.sfx && sounds.levelCompleted.play();
     ctx.font = '50px ArcadeClassic';
     ctx.fillStyle = 'yellow';
 }
@@ -381,7 +378,7 @@ function isGameOver() {
 
     if (isBallLost()) {
         game.lives -= 1;
-        game.sfx && sounds.ballLost.play();
+        // game.sfx && sounds.ballLost.play();
         if (game.lives === 0) {
             gameOver();
             return true;
@@ -394,29 +391,29 @@ function isGameOver() {
 
 function gameOver() {
     game.on = false;
-    sounds.music.pause();
-    sounds.currentTime = 0;
-    game.sfx && sounds.gameOver.play();
+    // sounds.music.pause();
+    // sounds.currentTime = 0;
+    // game.sfx && sounds.gameOver.play();
     ctx.font = '50px ArcadeClassic';
     ctx.fillStyle = 'red';
     ctx.fillText('GAME OVER', canvas.width / 2 - 100, canvas.height / 2);
 }
 
-function volumeDown() {
-    if (sounds.music.volume >= 0.1) {
-        for (const [key] of Object.entries(sounds)) {
-            sounds[key].volume -= 0.1;
-        }
-    }
-}
+// function volumeDown() {
+//     if (sounds.music.volume >= 0.1) {
+//         for (const [key] of Object.entries(sounds)) {
+//             sounds[key].volume -= 0.1;
+//         }
+//     }
+// }
 
 
-function volumeUp() {
-    if (sounds.music.volume <= 0.9) {
-        for (const [key] of Object.entries(sounds)) {
-            sounds[key].volume += 0.1;
-        }
-    }
-}
+// function volumeUp() {
+//     if (sounds.music.volume <= 0.9) {
+//         for (const [key] of Object.entries(sounds)) {
+//             sounds[key].volume += 0.1;
+//         }
+//     }
+// }
 
-initSounds();
+// initSounds();
