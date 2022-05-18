@@ -150,7 +150,9 @@ function animate(now = 0) {
         update();
         detectCollision();
         detectBrickCollision();
-        if (isLevelCompleted() || isGameOver()) return;
+        // if (isLevelCompleted() || isGameOver()) return; //TODO add back when fat arrow isLevelCompleted is fixed
+        if (isGameOver()) return;
+
     }    
 
     game.requestId = requestAnimationFrame(animate);
@@ -211,14 +213,31 @@ function drawLives() {
 }
 
 function detectCollision() {
-    const hitTop = () => ball.y < 0;
-    const hitLeftWall = () => ball.x < 0;
-    const hitRightWall = () => ball.x + ball.radius * 2 > canvas.width;
-    const hitPaddle = () => 
-        ball.y + 2 * ball.radius > canvas.height - paddle.height &&
+    // const hitTop = () => ball.y < 0;
+    function hitTop() {
+        return ball.y < 0;
+    };
+
+    // const hitLeftWall = () => ball.x < 0;
+    function hitLeftWall() {
+        return ball.x < 0;
+    }
+    // const hitRightWall = () => ball.x + ball.radius * 2 > canvas.width;
+    function hitRightWall() {
+        return ball.x + ball.radius * 2 > canvas.width;
+    }
+    
+    // const hitPaddle = () => 
+    //     ball.y + 2 * ball.radius > canvas.height - paddle.height &&
+    //     ball.y + ball.radius < canvas.height && 
+    //     ball.x + ball.radius > paddle.x &&
+    //     ball.x + ball.radius < paddle.x + paddle.width;
+    function hitPaddle() {
+        return  ball.y + 2 * ball.radius > canvas.height - paddle.height &&
         ball.y + ball.radius < canvas.height && 
         ball.x + ball.radius > paddle.x &&
         ball.x + ball.radius < paddle.x + paddle.width;
+    }
 
     if (hitLeftWall()) {
         ball.dx = -ball.dx;
@@ -249,11 +268,18 @@ function detectCollision() {
 
 function detectBrickCollision() {
     // let directionChanged = false;
-    const isBallInsideBrick = (brick) => 
-        ball.x + 2 * ball.radius > brick.x &&
+    // const isBallInsideBrick = (brick) => 
+    //     ball.x + 2 * ball.radius > brick.x &&
+    //     ball.x < brick.x + brick.width && 
+    //     ball.y + 2 * ball.radius > brick.y && 
+    //     ball.y < brick.y + brick.height;
+
+    function isBallInsideBrick(brick) {
+        return ball.x + 2 * ball.radius > brick.x &&
         ball.x < brick.x + brick.width && 
         ball.y + 2 * ball.radius > brick.y && 
         ball.y < brick.y + brick.height;
+    };
   
     brickField.forEach( function(brick) {
         if (brick.hitsLeft && isBallInsideBrick(brick)) {
@@ -278,14 +304,21 @@ function detectBrickCollision() {
                 // directionChanged = true;
                 detectCollisionDirection(brick);
 
-                isLevelCompleted(); 
+                // isLevelCompleted(); 
         } 
     });
 }
 
 function detectCollisionDirection(brick) {
-    const hitFromLeft = () => ball.x + 2 * ball.radius - ball.dx <= brick.x;
-    const hitFromRight = () => ball.x - ball.dx >= brick.x + brick.width;
+    // const hitFromLeft = () => ball.x + 2 * ball.radius - ball.dx <= brick.x;
+    function hitFromLeft() {
+        return ball.x + 2 * ball.radius - ball.dx <= brick.x;
+    };
+
+    // const hitFromRight = () => ball.x - ball.dx >= brick.x + brick.width;
+    function hitFromRight() {
+        return ball.x - ball.dx >= brick.x + brick.width;
+    };
 
     if (hitFromLeft() || hitFromRight()) {
       ball.dx = -ball.dx;
@@ -328,8 +361,10 @@ function keyUpHandler(e) {
 
 function mouseMoveHandler(e) {
     const mouseX = e.clientX - canvas.offsetLeft;    
-    const isInsideCourt = () => mouseX > 0 && mouseX < canvas.width;
-
+    // const isInsideCourt = () => mouseX > 0 && mouseX < canvas.width;
+    function isInsideCourt() {
+        return mouseX > 0 && mouseX < canvas.width;
+    }
     if(isInsideCourt()) {
         paddle.x = mouseX - paddle.width / 2;
     }
@@ -350,19 +385,25 @@ function touchHandler(e) {
 };
 
 
-function isLevelCompleted() {
-    const levelComplete = brickField.every((b) => b.hitsLeft === 0);
+// function isLevelCompleted() {
+//     const levelComplete = brickField.every((b) => b.hitsLeft === 0); //TODO how adjust??
+//     // function levelComplete() {
+//     //     brickField.every(function(b) {
+//     //         return b.hitsLeft === 0;
+//     //     });
+//     // }
 
-    if (levelComplete) {
-        initNextLevel();
-        resetBall();
-        resetPaddle();
-        initBricks();
-        animate();
-        return true;
-    }
-    return false;
-}
+
+//     if (levelComplete) {
+//         initNextLevel();
+//         resetBall();
+//         resetPaddle();
+//         initBricks();
+//         animate();
+//         return true;
+//     }
+//     return false;
+// }
 
 function initNextLevel() {
     game.level++;
@@ -374,8 +415,10 @@ function initNextLevel() {
 }
 
 function isGameOver() {
-    const isBallLost = () => ball.y - ball.radius > canvas.height;
-
+    // const isBallLost = () => ball.y - ball.radius > canvas.height;
+    function isBallLost() {
+        return ball.y - ball.radius > canvas.height;
+    }
     if (isBallLost()) {
         game.lives -= 1;
         // game.sfx && sounds.ballLost.play();
