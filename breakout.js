@@ -51,13 +51,13 @@ let ball = {
     radius: 10
 };
 let brick = {
-    rows: 1,
-    cols: 3,
-    height: 200,
-    // rows: 3,
-    // cols: 20,
+    // rows: 1,
+    // cols: 3,
+    // height: 200,
+    rows: 3,
+    cols: 20,
     get width() { return canvas.width / this.cols; },
-    // get height() {return (canvas.width / this.cols)*2.6}
+    get height() {return (canvas.width / this.cols)*2.6}
 }
 let images = {
     background: new Image(),
