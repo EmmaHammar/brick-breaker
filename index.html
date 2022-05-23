@@ -27,24 +27,11 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
     </head>
 <body>
-    <div style="display: flex; justify-content: space-between;">
-        <h1 class="title">Breakout</h1>
-        <div class="controls">
-            <p class="controls">Play with Arrow keys or Mouse</p>
-            <p>Music: M</p>
-            <p>SFX: S</p>
-            <p>Volume: ↑ ↓</p>
-            <p>Start: Space</p>
-        </div>
-
-        <a href="https://github.com/melcor76/js-breakout" target="_blank">
-            <img src="assets/github-32px.png" alt="github logo" />
-        </a>    
+    <div id="gameBoardWrapper">
+        <canvas id="canvas"></canvas>
+        <button id="play-button" onclick="play()">STARTA SPELET</button>
     </div>
     
-    <canvas id="breakout" width="800" height="600"></canvas>
-    <br/>
-    <button id="play-button" onclick="play()">STARTA SPELET</button>
 
     <script type="text/javascript" src="breakout.js"></script>
 </body>

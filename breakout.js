@@ -1,5 +1,26 @@
-const canvas = document.getElementById('breakout');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const canvasWrapper = document.getElementById('canvasWrapper');
+
+const gameBoardWrapper = document.getElementById('gameBoardWrapper');
+
+// let heightRatio = 1.2;
+// canvas.height = canvas.width * heightRatio;
+
+
+var rect = canvas.parentNode.getBoundingClientRect();
+
+gameBoardWrapper.width = rect.width;
+gameBoardWrapper.height = rect.height;
+canvas.width = gameBoardWrapper.width;
+canvas.height = gameBoardWrapper.height;
+
+// canvas.width = rect.width;
+// canvas.height = rect.height;
+
+// alert('Styr till höger eller vänster med piltangenterna, mus eller ditt finger. För att starta, tryck på "mellanslag" eller klicka på start-knappen.')
+
+
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
@@ -32,11 +53,11 @@ let ball = {
 let brick = {
     // rows: 1,
     // cols: 3,
-    // height: 160,
+   
     rows: 3,
     cols: 20,
-    height: 80,
     get width() { return canvas.width / this.cols; },
+    get height() {return (canvas.width / this.cols)*2.6}
 }
 let images = {
     background: new Image(),
@@ -62,7 +83,7 @@ window.onload = function() {
 images.background.src = './images/bg-space.webp';
 images.ball.src = './images/ball.webp';
 images.paddle.src = './images/paddle.webp';
-// images.bricks.src = './images/bottle.png';  //bricks image
+// images.paddle.src = 'https://content.adoveodemo.com/2022-05-19T11-54-07.022903_paddle.webp';
 images.bricks.src = './images/bottle-cropped.png';  //cropped image
 
 
@@ -150,8 +171,8 @@ function animate(now = 0) {
         update();
         detectCollision();
         detectBrickCollision();
-        // if (isLevelCompleted() || isGameOver()) return; //TODO add back when fat arrow isLevelCompleted is fixed
-        if (isGameOver()) return;
+        if (isLevelCompleted() || isGameOver()) return; //TODO add back when fat arrow isLevelCompleted is fixed
+        // if (isGameOver()) return;
 
     }    
 
@@ -199,17 +220,21 @@ function drawBricks() {
 }
 
 function drawScore() {
-    ctx.font = '24px ArcadeClassic';
+    ctx.font = '1rem Helvetica';
     ctx. fillStyle = 'white';
     const { level, score } = game;
-    ctx.fillText(`Level: ${level}`, 5, 23);
-    ctx.fillText(`Score: ${score}`, canvas.width / 2 - 50, 23);
+    ctx.fillText(`NIVÅ: ${level}`, 5, 23);
+    ctx.fillText(`POÄNG: ${score}`, canvas.width / 2 - 50, 23);
 }
 
 function drawLives() {
-    if (game.lives > 2) { ctx.drawImage(images.paddle, canvas.width - 150, 9, 40, 13); }
-    if (game.lives > 1) { ctx.drawImage(images.paddle, canvas.width - 100, 9, 40, 13); }
-    if (game.lives > 0) { ctx.drawImage(images.paddle, canvas.width - 50, 9, 40, 13); }
+    // if (game.lives > 2) { ctx.drawImage(images.paddle, canvas.width - 150, 9, 40, 13); }
+    // if (game.lives > 1) { ctx.drawImage(images.paddle, canvas.width - 100, 9, 40, 13); }
+    // if (game.lives > 0) { ctx.drawImage(images.paddle, canvas.width - 50, 9, 40, 13); }
+    if (game.lives > 2) { ctx.drawImage(images.paddle, canvas.width - 88, 12, 24, 9); }
+    if (game.lives > 1) { ctx.drawImage(images.paddle, canvas.width - 58, 12, 24, 9); }
+    if (game.lives > 0) { ctx.drawImage(images.paddle, canvas.width - 28, 12, 24, 9); }
+
 }
 
 function detectCollision() {
@@ -304,7 +329,7 @@ function detectBrickCollision() {
                 // directionChanged = true;
                 detectCollisionDirection(brick);
 
-                // isLevelCompleted(); 
+                isLevelCompleted(); 
         } 
     });
 }
@@ -385,25 +410,50 @@ function touchHandler(e) {
 };
 
 
-// function isLevelCompleted() {
-//     const levelComplete = brickField.every((b) => b.hitsLeft === 0); //TODO how adjust??
-//     // function levelComplete() {
-//     //     brickField.every(function(b) {
-//     //         return b.hitsLeft === 0;
-//     //     });
-//     // }
+function isLevelCompleted() {
+    // const levelComplete = brickField.every((b) => b.hitsLeft === 0); //TODO fix to normal function
 
+    // brickField.every( function(b) {
+    //     return b.hitsLeft === 0;
+    // })
 
-//     if (levelComplete) {
-//         initNextLevel();
-//         resetBall();
-//         resetPaddle();
-//         initBricks();
-//         animate();
-//         return true;
-//     }
-//     return false;
-// }
+    // if (levelComplete) {
+    //     initNextLevel();
+    //     resetBall();
+    //     resetPaddle();
+    //     initBricks();
+    //     animate();
+    //     return true;
+    // }
+    // return false;
+    // levelComplete();
+
+    // function levelComplete() {
+        // return brickField.every( function(b) {
+        //     b.hitsLeft === 0
+        for(var i=0; i < brickField.length; i++) {
+            console.log("i?", brickField[i].hitsLeft);
+            if (brickField[i].hitsLeft === 0) {
+                console.log("NEXT LEVEL");
+            } else {
+                console.log("nothing happens");
+            }
+        //  return brickField[i].hitsLeft === 0;
+        // }
+    }
+    // var isNextLevel = levelComplete();
+    // console.log("isNextLevel:", isNextLevel);
+
+    // if (isNextLevel) {
+    //     initNextLevel();
+    //     resetBall();
+    //     resetPaddle();
+    //     initBricks();
+    //     animate();
+    //     return true;
+    // }
+    // return false;
+}
 
 function initNextLevel() {
     game.level++;
