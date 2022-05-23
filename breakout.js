@@ -51,13 +51,13 @@ let ball = {
     radius: 10
 };
 let brick = {
-    // rows: 1,
-    // cols: 3,
-   
-    rows: 3,
-    cols: 20,
+    rows: 1,
+    cols: 3,
+    height: 200,
+    // rows: 3,
+    // cols: 20,
     get width() { return canvas.width / this.cols; },
-    get height() {return (canvas.width / this.cols)*2.6}
+    // get height() {return (canvas.width / this.cols)*2.6}
 }
 let images = {
     background: new Image(),
@@ -411,36 +411,38 @@ function touchHandler(e) {
 
 
 function isLevelCompleted() {
-    // const levelComplete = brickField.every((b) => b.hitsLeft === 0); //TODO fix to normal function
+    const levelComplete = brickField.every((b) => b.hitsLeft === 0); //TODO fix to normal function
 
-    // brickField.every( function(b) {
-    //     return b.hitsLeft === 0;
-    // })
+    brickField.every( function(b) {
+        return b.hitsLeft === 0;
+    })
 
-    // if (levelComplete) {
-    //     initNextLevel();
-    //     resetBall();
-    //     resetPaddle();
-    //     initBricks();
-    //     animate();
-    //     return true;
-    // }
-    // return false;
+    if (levelComplete) {
+        initNextLevel();
+        resetBall();
+        resetPaddle();
+        initBricks();
+        animate();
+        return true;
+    }
+    return false;
+
+    
     // levelComplete();
 
     // function levelComplete() {
         // return brickField.every( function(b) {
         //     b.hitsLeft === 0
-        for(var i=0; i < brickField.length; i++) {
-            console.log("i?", brickField[i].hitsLeft);
-            if (brickField[i].hitsLeft === 0) {
-                console.log("NEXT LEVEL");
-            } else {
-                console.log("nothing happens");
-            }
-        //  return brickField[i].hitsLeft === 0;
+        // for(var i=0; i < brickField.length; i++) {
+        //     console.log("i?", brickField[i].hitsLeft);
+        //     if (brickField[i].hitsLeft === 0) {
+        //         console.log("NEXT LEVEL");
+        //     } else {
+        //         console.log("nothing happens");
+        //     }
+        // //  return brickField[i].hitsLeft === 0;
+        // // }
         // }
-    }
     // var isNextLevel = levelComplete();
     // console.log("isNextLevel:", isNextLevel);
 
